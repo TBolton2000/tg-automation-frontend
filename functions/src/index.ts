@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import * as admin from 'firebase-admin';
+import * as admin from "firebase-admin";
 admin.initializeApp();
 
 const db = admin.firestore();
@@ -14,18 +14,18 @@ export const helloWorld = functions.https.onRequest((request, response) => {
 
 export const createNewUserInFirestore = functions.auth.user().onCreate((user)=>{
   db.doc("/users/"+ user.uid).set({
-    name: user.displayName
-  })
+    name: user.displayName,
+  });
 });
 
-// export const addHiderBotToTeam = functions.firestore.document("/hider_bots/{bot_id}")
-// .onWrite((change, context) =>{
+// export const addHiderBotToTeam = functions.firestore
+// .document("/hider_bots/{bot_id}").onWrite((change, context) =>{
 //   const data = change.after.data();
 //   db.doc(data?.team)
 // });
 
-// export const addSeekerBotToTeam = functions.firestore.document("/seeker_bots/{bot_id}")
-// .onWrite((change, context) =>{
+// export const addSeekerBotToTeam = functions.firestore
+// .document("/seeker_bots/{bot_id}").onWrite((change, context) =>{
 //   const data = change.after.data();
 //   db.doc(data?.team).update({
 

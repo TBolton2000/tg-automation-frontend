@@ -8,7 +8,7 @@ import {storage, auth, signInWithGoogle} from "./firebase";
 
 
 import {useState} from "react";
-import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes, Navigate} from "react-router-dom";
 import {FirebaseAuth} from "react-firebaseui";
 import {useAuthState} from "react-firebase-hooks/auth";
 import NavBar from './NavBar';
@@ -24,13 +24,17 @@ const App = () => {
       <header className="App-header">
         { !loading && !error &&
         <Router>
-        <NavBar/>
+        <NavBar user={user}/>
         <Routes>
           <Route path="/">
             <Route index element={<p>leaderboard</p>} />
           </Route>
-          <Route path="/myteam" element={<MyTeam user={user}/>} />
-          <Route path="/teams" element={<Teams user={user}/>} />
+          {!!user &&
+          [<Route key="myteam" path="/myteam" element={<MyTeam user={user}/>} />,
+          <Route key="teams" path="/teams" element={<Teams user={user}/>} />]
+          }
+          {/* <Route key="myteam" path="/myteam" element={<MyTeam user={user}/>} />
+          <Route key="teams" path="/teams" element={<Teams user={user}/>} /> */}
         </Routes>
         </Router>
         }

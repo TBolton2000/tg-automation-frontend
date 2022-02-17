@@ -6,8 +6,7 @@ import {AppBar, Button, Toolbar, Typography, Box, SvgIcon, IconButton, Link} fro
 
 
 
-const NavBar = () => {
-    const [user, loading, error] = useAuthState(auth);
+const NavBar = ({user}) => {
     return (
         // <Box sx={{ flexGrow: 1 }}>
         <AppBar position="sticky">
@@ -20,10 +19,14 @@ const NavBar = () => {
                 sx={{ mr: 2 }}>  */}
                     {/* <SvgIcon edge="start" fontSize="large" sx={{ mr: 2 }} viewBox="0 0 2732.000000 2048.000000" component={LogoIcon}></SvgIcon>                 */}
                     <Typography variant="h6" component="div">Turing Games</Typography>
-                    <Link style={{padding: "10px", textDecoration: "none"}} color="inherit" href="/">Leaderboard</Link>
-                    <Link style={{padding: "10px", textDecoration: "none"}} color="inherit" href="/teams">Teams</Link>
-                    <Link style={{padding: "10px", textDecoration: "none"}} color="inherit" href="/myteam" sx={{ flexGrow: 1 }}>My Team</Link>
-                { !user || loading ?
+                    {!!user ?
+                    [<Link key="1" style={{padding: "10px", textDecoration: "none"}} color="inherit" href="/">Leaderboard</Link>,
+                    <Link key="2" style={{padding: "10px", textDecoration: "none"}} color="inherit" href="/teams">Teams</Link>,
+                    <Link key="3" style={{padding: "10px", textDecoration: "none"}} color="inherit" href="/myteam" sx={{ flexGrow: 1 }}>My Team</Link>]
+                    :
+                    <Link style={{padding: "10px", textDecoration: "none"}} color="inherit" href="/" sx={{ flexGrow: 1 }}>Leaderboard</Link>
+                    }
+                { !user ?
                 <Button color="inherit" onClick={signInWithGoogle}>Log In with Google</Button>
                 :
                 <div>

@@ -129,7 +129,7 @@ const MyTeam = ({user}) => {
 
     return (
         <div>
-            {team && 
+            {team ? 
                 <Container maxWidth="md">
                     <Typography variant="h4">Team name: {team.data.name}</Typography>
                     <Typography variant="h5">Team size: {team.data.members.length} / {team.data.maxCapacity}</Typography>
@@ -160,6 +160,17 @@ const MyTeam = ({user}) => {
                         <BotCard key={"hider_slot"+index} bot={hiderBot} botType={"hider"} teamRef={team.doc}/>
                     )}
                     
+                </Container>
+                :
+                <Container maxWidth="md" height="100%">
+                    <center>
+                        <Typography variant="h5">
+                            You are not part of a team yet! 
+                        </Typography>
+                        <Typography variant="h6">
+                            Go create or join one on the Teams page
+                        </Typography>
+                    </center>
                 </Container>
             }
             
