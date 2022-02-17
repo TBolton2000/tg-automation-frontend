@@ -1,0 +1,7 @@
+.botCardContainer {
+    margin: 10px;
+}
+.botCardCard {
+    padding: 10px;
+    flex-direction: column;
+}
