@@ -8,7 +8,7 @@ import { Dialog,
     Typography} from "@mui/material";
 import { useEffect, useState } from "react";
 import { storage, fileStorage, ref, uploadBytesResumable, getDownloadURL } from "./firebase";
-import { collection, query, where, doc, setDoc, Timestamp, writeBatch, arrayRemove, arrayUnion } from "firebase/firestore";
+import { doc, Timestamp, writeBatch, arrayRemove, arrayUnion } from "firebase/firestore";
 
 const SubmitBotDialog = ({open, setOpen, botType, bot, teamRef}) => {
     const handleClose = () => { setOpen(false) }
@@ -89,12 +89,10 @@ const SubmitBotDialog = ({open, setOpen, botType, bot, teamRef}) => {
             });
         }
         );
-        setUploadTask(localUploadTask);
     }
 
     const [botName, setBotName] = useState('');
     const [file, setFile] = useState(null);
-    const [uploadTask, setUploadTask] = useState(null);
 
     const [submitButtonEnabled, setSubmitButtonEnabled] = useState(false);
 

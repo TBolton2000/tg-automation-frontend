@@ -6,11 +6,11 @@ service cloud.firestore {
     }
     
     match /teams/{team} {
-    	allow create: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.team == null; // If user is auth and does not have a team
+    	allow create: if request.auth != null && !(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.keys().hasAny(["team", "pendingJoin"])); // If user is auth and does not have a team
       allow update: if request.auth != null && resource.data.members[0].uid == request.auth.uid; // if user is leader of the team
       // Following update only allows you to add yourself to the pending list and not change anything else
       allow update: if request.auth != null && resource.data.members == request.resource.data.members && resource.data.name == request.resource.data.name && resource.data.maxCapacity == request.resource.data.maxCapacity && resource.data.seeker_bots == request.resource.data.seeker_bots && resource.data.hider_bots == request.resource.data.hider_bots
-      allow delete: if request.auth != null && resource.data.members[0].uid == request.auth.uid && resource.data.members.length == 1; // Only delete if you are the only member and the leader
+      allow delete: if request.auth != null && resource.data.members[0].uid == request.auth.uid; // Only delete if you are the only member and the leader
     }
     
     match /hider_bots/{document=**} {

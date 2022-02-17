@@ -1,6 +1,6 @@
 import { useDocument } from "react-firebase-hooks/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { collection, doc, query, where, getDoc } from "firebase/firestore";
+import { collection, doc, query, where, getDoc, writeBatch, deleteField, arrayRemove, arrayUnion } from "firebase/firestore";
 import { auth, storage } from "./firebase";
 import { useEffect, useState } from "react";
 import { Container, Typography, Button, Table, TableBody, TableHead, TableRow, TableCell } from "@mui/material";
@@ -37,16 +37,58 @@ const showPendingJoinButton = (is_leader, teamSize, capacity) => {
     return (is_leader && capacity > teamSize);
 }
 
-const MyTeam = () => {
+const removeUserFromTeam = async (userToRemove, team) => {
+    const batch = writeBatch(storage);
+    const userRef = doc(storage, "/users", userToRemove.uid);
+    batch.update(userRef, {
+        team: deleteField()
+    });
+    const teamRef = team.doc;
+    if (team.data.members.length == 1) {
+        batch.delete(teamRef);
+    } else {
+        batch.update(teamRef, {
+            members: arrayRemove(userToRemove)
+        });
+    }
+    try {
+        await batch.commit();
+        window.location.reload(false);
+    } catch(e) {
+        console.log(e);
+    }
+}
 
-    
-    const [user, authLoading, authError] = useAuthState(auth);
+const addUserToTeam = async (userToAdd, team) => {
+    const batch = writeBatch(storage);
+    const teamRef = team.doc;
+
+    batch.update(teamRef, {
+        members: arrayUnion(userToAdd),
+        pendingJoins: arrayRemove(userToAdd)
+    })
+
+    const userRef = doc(storage, "/users", userToAdd.uid);
+    batch.update(userRef, {
+        pendingJoin: deleteField(),
+        team: teamRef
+    });
+
+    try {
+        await batch.commit();
+        window.location.reload(false);
+    } catch(e) {
+        console.log(e);
+    }
+}
+
+const MyTeam = ({user}) => {
     
     const [team, setTeam] = useState(null);
 
     useEffect(async ()=>{
         if (!!user) {
-            const userRef = doc(storage, "users", user.uid);
+            const userRef = doc(storage, "/users", user.uid);
             const userDoc = await getDoc(userRef);
             if (userDoc.exists() && userDoc.data().team) {
                 console.log(userDoc.data().team)
@@ -81,9 +123,9 @@ const MyTeam = () => {
                 }
             }
         }
-    }, [user])
+    }, [user]);
 
-    console.log(team);
+    console.log(user, team);
 
     return (
         <div>
@@ -97,7 +139,7 @@ const MyTeam = () => {
                         owner={team.data.members[0]}
                         buttonText={"Remove"}
                         buttonShow={showMemberActionButton}
-                        buttonAction={(userToRemove)=>{console.log("Removing",userToRemove)}}
+                        buttonAction={(userToRemove)=>{removeUserFromTeam(userToRemove, team)}}
                         self={user}
                         capacity={team.maxCapacity}/>
                     <Typography variant="h5">Pending joins:</Typography>
@@ -106,7 +148,7 @@ const MyTeam = () => {
                         owner={team.data.members[0]}
                         buttonText="Add"
                         buttonShow={showPendingJoinButton}
-                        buttonAction={(userToAdd)=>{console.log("Adding", userToAdd)}} 
+                        buttonAction={(userToAdd)=>{addUserToTeam(userToAdd, team)}} 
                         self={user}
                         capacity={team.data.maxCapacity}/>
                     <Typography variant="h5">Seeker Bots:</Typography>

@@ -1,10 +1,11 @@
 import { useCollection, useDocumentData } from "react-firebase-hooks/firestore";
-import { collection, doc, query, where, writeBatch, arrayUnion, arrayRemove } from "firebase/firestore";
+import { collection, doc, query, where, writeBatch, arrayUnion, arrayRemove, deleteField } from "firebase/firestore";
 import { storage, auth } from "./firebase";
 import { Button, Table, TableBody, TableHead, TableRow, TableCell, Container, Typography } from "@mui/material";
 import TeamRow from "./TeamRow";
+import CreateTeamDialog from "./CreateTeamDialog";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 
 const Teams = ({user}) => {
@@ -17,6 +18,8 @@ const Teams = ({user}) => {
     const userRef = doc(storage, "/users", user.uid);
     const userQuery = query(userRef);
     const [userData, userLoading, userError] = useDocumentData(userQuery);
+
+    const [createTeamDialogOpen, setCreateTeamDialogOpen] = useState(false);
 
     const joinPendingForTeam = async (teamRef) => {
         const batch = writeBatch(storage);
@@ -41,7 +44,7 @@ const Teams = ({user}) => {
         const batch = writeBatch(storage);
         const selfRef = doc(storage, "/users", user.uid);
         batch.update(selfRef, {
-            pendingJoin: undefined
+            pendingJoin: deleteField()
         });
         batch.update(teamRef, {
             pendingJoins: arrayRemove({
@@ -55,13 +58,21 @@ const Teams = ({user}) => {
             console.log(e);
         }
     };
-    
-    console.log(user);
 
     return (
         <Container fixed>
             {user === null || teamsLoading || userLoading ? <p>loading...</p> : <p>loaded</p>}
             {userError && <Typography>User Error Occurred: {userError.message}</Typography>}
+            {!teamsLoading && !teamsError && !userLoading && !userError && 
+            [
+                <Button key="button" onClick={()=>{setCreateTeamDialogOpen(true)}}>Create New Team</Button>,
+                <CreateTeamDialog key="dialog"
+                    allTeams={teamsSnapshot.docs.map((doc)=>doc.data().name)}
+                    open={createTeamDialogOpen}
+                    setOpen={setCreateTeamDialogOpen}
+                    user={user}/>
+            ]
+            }
             <Table>
                 <TableHead>
                     <TableRow>
@@ -71,7 +82,7 @@ const Teams = ({user}) => {
                         <TableCell>Team Member 3</TableCell>
                         <TableCell>Team Member 4</TableCell>
                         <TableCell>Capacity</TableCell>
-                        <TableCell>Join?</TableCell>
+                        <TableCell>Action</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
