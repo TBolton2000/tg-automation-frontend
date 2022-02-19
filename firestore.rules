@@ -5,9 +5,14 @@ service cloud.firestore {
     	allow read: if true;
     }
     
+    match /scoreboard/{id} {
+    	allow read: if true;
+    }
+    
     match /teams/{team} {
     	allow create: if request.auth != null && !(get(/databases/$(database)/documents/users/$(request.auth.uid)).data.keys().hasAny(["team", "pendingJoin"])); // If user is auth and does not have a team
       allow update: if request.auth != null && resource.data.members[0].uid == request.auth.uid; // if user is leader of the team
+      allow update: if request.auth != null && (resource.data.members[0].uid == request.auth.uid || (resource.data.members.size() > 1 && resource.data.members[1].uid == request.auth.uid) || (resource.data.members.size() > 2 && resource.data.members[2].uid == request.auth.uid) || (resource.data.members.size() > 3 && resource.data.members[3].uid == request.auth.uid))
       // Following update only allows you to add yourself to the pending list and not change anything else
       allow update: if request.auth != null && resource.data.members == request.resource.data.members && resource.data.name == request.resource.data.name && resource.data.maxCapacity == request.resource.data.maxCapacity && resource.data.seeker_bots == request.resource.data.seeker_bots && resource.data.hider_bots == request.resource.data.hider_bots
       allow delete: if request.auth != null && resource.data.members[0].uid == request.auth.uid; // Only delete if you are the only member and the leader
@@ -29,6 +34,7 @@ service cloud.firestore {
     }
     match /users/{userId} {
     	allow read, write: if request.auth != null && resource.id == request.auth.uid;
+      allow update: if request.auth != null && resource.data.name == request.resource.data.name
     }
   }
 }
