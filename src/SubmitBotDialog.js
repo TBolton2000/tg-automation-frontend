@@ -115,7 +115,7 @@ const SubmitBotDialog = ({open, setOpen, botType, bot, teamRef}) => {
             </DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    Please choose a new {botType} bot to submit:
+                    Please choose a new {botType} bot to submit (note: bot names are public):
                 </DialogContentText>
             </DialogContent>
             <DialogContent style={{flexDirection: "down"}}>
@@ -129,7 +129,7 @@ const SubmitBotDialog = ({open, setOpen, botType, bot, teamRef}) => {
                 </Button>
                 {file !== null &&
                     <Typography>
-                        Selected file: {file.name}
+                        Selected file (file name is kept secret): {file.name}
                     </Typography>
                 }
             </DialogContent>

@@ -91,7 +91,6 @@ const MyTeam = ({user}) => {
             const userRef = doc(storage, "/users", user.uid);
             const userDoc = await getDoc(userRef);
             if (userDoc.exists() && userDoc.data().team) {
-                console.log(userDoc.data().team)
                 // const teamRef = doc(storage, userDoc.data().team);
                 const teamDoc = await getDoc(userDoc.data().team);
                 if (teamDoc.exists()) {
@@ -124,8 +123,6 @@ const MyTeam = ({user}) => {
             }
         }
     }, [user]);
-
-    console.log(user, team);
 
     return (
         <div>

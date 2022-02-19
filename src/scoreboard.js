@@ -37,7 +37,7 @@ const Scoreboard = () => {
                             <TableRow key={seeker.id}>
                                 <TableCell>{seeker.name}</TableCell>
                                 <TableCell>{seeker.team}</TableCell>
-                                <TableCell>{seeker.average_points.toFixed(3)}</TableCell>
+                                <TableCell>{Math.round(seeker.average_points*1000)/1000}</TableCell>
                             </TableRow>
                         )
                     }
@@ -62,7 +62,7 @@ const Scoreboard = () => {
                             <TableRow key={hider.id}>
                                 <TableCell>{hider.name}</TableCell>
                                 <TableCell>{hider.team}</TableCell>
-                                <TableCell>{hider.average_points.toFixed(3)}</TableCell>
+                                <TableCell>{Math.round(hider.average_points * 1000) / 100}</TableCell>
                             </TableRow>
                         )
                     }

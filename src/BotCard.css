@@ -3,5 +3,9 @@
 }
 .botCardCard {
     padding: 10px;
+    
+}
+
+.botCardHeader {
     flex-direction: column;
 }
