@@ -44,6 +44,7 @@ const CreateTeamDialog = ({open, setOpen, allTeams, user}) => {
         });
         try {
             await batch.commit();
+            setOpen(false);
         } catch (e) {
             console.log(e);
         }

@@ -14,7 +14,6 @@ const Teams = ({user}) => {
     const teamsQuery = query(teamsRef);
     const [teamsSnapshot, teamsLoading, teamsError] = useCollection(teamsQuery);
 
-    console.log(user.uid);
     const userRef = doc(storage, "/users", user.uid);
     const userQuery = query(userRef);
     const [userData, userLoading, userError] = useDocumentData(userQuery);
@@ -61,9 +60,8 @@ const Teams = ({user}) => {
 
     return (
         <Container fixed>
-            {user === null || teamsLoading || userLoading ? <p>loading...</p> : <p>loaded</p>}
             {userError && <Typography>User Error Occurred: {userError.message}</Typography>}
-            {!teamsLoading && !teamsError && !userLoading && !userError && 
+            {!teamsLoading && !teamsError && !userLoading && !userError && !userData.team &&
             [
                 <Button key="button" onClick={()=>{setCreateTeamDialogOpen(true)}}>Create New Team</Button>,
                 <CreateTeamDialog key="dialog"

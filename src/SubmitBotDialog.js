@@ -72,10 +72,13 @@ const SubmitBotDialog = ({open, setOpen, botType, bot, teamRef}) => {
                 const newBotRef = doc(storage, `/${botType}_bots`, `${botName}--${timestamp}`);
                 batch.set(newBotRef, {
                     name: botName,
+                    file_name: file.name,
                     timestamp: Timestamp.fromMillis(timestamp),
                     downloadURL: downloadURL,
                     team: teamRef,
-                    replaced: false
+                    replaced: false,
+                    approved: false,
+                    matches: {}
                 });
                 const arrayUnionObj = {};
                 arrayUnionObj[`${botType}_bots`] = arrayUnion(newBotRef);

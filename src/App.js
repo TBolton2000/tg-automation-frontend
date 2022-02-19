@@ -14,6 +14,7 @@ import {useAuthState} from "react-firebase-hooks/auth";
 import NavBar from './NavBar';
 import Teams from './Teams';
 import MyTeam from './MyTeam';
+import Scoreboard from './scoreboard';
 
 const App = () => {
   
@@ -27,7 +28,7 @@ const App = () => {
         <NavBar user={user}/>
         <Routes>
           <Route path="/">
-            <Route index element={<p>leaderboard</p>} />
+            <Route index element={<Scoreboard />} />
           </Route>
           {!!user &&
           [<Route key="myteam" path="/myteam" element={<MyTeam user={user}/>} />,

@@ -5,8 +5,6 @@ import { storage } from "./firebase";
 const TeamRow = ({name, members, maxCapacity, onJoin, onUnjoin, teamId, usersPendingJoinTeamRef, usersTeamRef}) => {
     const teamRef = doc(storage, "/teams", teamId);
 
-    console.log(usersPendingJoinTeamRef, usersTeamRef, teamRef);
-
     return (
         <TableRow>
             <TableCell>{name}</TableCell>
