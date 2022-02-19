@@ -38,17 +38,28 @@ const MatchHistoryRow = ({opponentName, opponentErrors, points, games}) => {
               <Table size="small" aria-label="games">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Game Message</TableCell>
+                    <TableCell>Game</TableCell>
+                    <TableCell>Seed</TableCell>
+                    <TableCell>Message</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {games.map((message, index) => (
+                  {games.map((gameString, index) => {
+                    const [gameNum, seedNum, ...rest] = gameString.split(", ");
+                    const message = rest.join(", ");
+                    return (
                     <TableRow key={index}>
+                      <TableCell component="th" scope="row">
+                        {parseInt(gameNum.split(" ")[1]) + 1}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {seedNum.split(" ")[1]}
+                      </TableCell>
                       <TableCell component="th" scope="row">
                         {message}
                       </TableCell>
-                    </TableRow>
-                  ))}
+                    </TableRow>)
+                  })}
                 </TableBody>
               </Table>
             </Box>
