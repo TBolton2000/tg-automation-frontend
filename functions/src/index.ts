@@ -50,6 +50,54 @@ export const cleanUpOnTeamDelete = functions.firestore
       }
     });
 
+export const onSeekerReplaced = functions.firestore
+    .document("/seeker_bots/{bot}").onUpdate(async (change, context)=>{
+      if (change.before.data().replaced == change.after.data().replaced) {
+        return;
+      }
+      // Remove this bot from all matches with active bots
+      const allValidBotsSnapshots = await db.collection("/hider_bots")
+          .where("replaced", "==", false).get();
+      const batch = db.batch();
+      for (const snapshot of allValidBotsSnapshots.docs) {
+        const data = snapshot.data();
+        if (Object.keys(data.matches).includes(change.before.id)) {
+          const objForRemove: any = {};
+          objForRemove[`matches.${change.before.id}`] =
+              admin.firestore.FieldValue.delete();
+          batch.update(snapshot.ref, objForRemove);
+          functions.logger.info("Removing ",
+              change.before.id, " from ", snapshot.id);
+        }
+      }
+      await batch.commit();
+      functions.logger.info("Successfully removed.");
+    });
+
+export const onHiderReplaced = functions.firestore
+    .document("/hider_bots/{bot}").onUpdate(async (change, context)=>{
+      if (change.before.data().replaced == change.after.data().replaced) {
+        return;
+      }
+      // Remove this bot from all matches with active bots
+      const allValidBotsSnapshots = await db.collection("/seeker_bots")
+          .where("replaced", "==", false).get();
+      const batch = db.batch();
+      for (const snapshot of allValidBotsSnapshots.docs) {
+        const data = snapshot.data();
+        if (Object.keys(data.matches).includes(change.before.id)) {
+          const objForRemove: any = {};
+          objForRemove[`matches.${change.before.id}`] =
+              admin.firestore.FieldValue.delete();
+          batch.update(snapshot.ref, objForRemove);
+          functions.logger.info("Removing ",
+              change.before.id, " from ", snapshot.id);
+        }
+      }
+      await batch.commit();
+      functions.logger.info("Successfully removed.");
+    });
+
 export const onSeekerSubmission = functions.firestore
     .document("/seeker_bots/{bot}").onCreate(async (snap, context) =>{
       functions.logger.info("botData:", snap.data());
@@ -127,14 +175,14 @@ export const getMatchDataFromEngine = functions.https
 
       const batch = db.batch();
       const seekerMatch = {
-        seeker_points,
-        hider_errors,
+        seeker_points: parseInt(seeker_points),
+        hider_errors: parseInt(hider_errors),
         seeker_info,
       };
 
       const hiderMatch = {
-        hider_points,
-        seeker_errors,
+        hider_points: parseInt(hider_points),
+        seeker_errors: parseInt(seeker_errors),
         hider_info,
       };
 
