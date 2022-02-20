@@ -35,6 +35,7 @@ const MatchHistoryRow = ({opponentName, opponentErrors, points, games}) => {
               <Typography variant="h6" gutterBottom component="div">
                 Games:
               </Typography>
+              {Array.isArray(games) ?
               <Table size="small" aria-label="games">
                 <TableHead>
                   <TableRow>
@@ -44,7 +45,7 @@ const MatchHistoryRow = ({opponentName, opponentErrors, points, games}) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {games.map((gameString, index) => {
+                  {!!games && Array.isArray(games) && games.map((gameString, index) => {
                     const [gameNum, seedNum, ...rest] = gameString.split(", ");
                     const message = rest.join(", ");
                     return (
@@ -62,6 +63,9 @@ const MatchHistoryRow = ({opponentName, opponentErrors, points, games}) => {
                   })}
                 </TableBody>
               </Table>
+              :
+              <Typography>Error in match: {games}</Typography>
+              }
             </Box>
           </Collapse>
         </TableCell>
@@ -92,8 +96,8 @@ const BotCard = ({botType, bot, teamRef}) => {
         {bot !== null && 
             <Typography style={{paddingLeft: "10px"}} variant="p">Submitted at {getTimeFromFirebase(bot.timestamp)}</Typography>
         }
-        <Button style={{float: "right"}} onClick={()=>{setOpenDialog(true)}}>{bot !== null ? "Replace this bot" : "Submit new bot"}</Button>
-        <SubmitBotDialog open={openDialog} setOpen={setOpenDialog} botType={botType} bot={bot} teamRef={teamRef}></SubmitBotDialog>
+        {/* <Button style={{float: "right"}} onClick={()=>{setOpenDialog(true)}}>{bot !== null ? "Replace this bot" : "Submit new bot"}</Button>
+        <SubmitBotDialog open={openDialog} setOpen={setOpenDialog} botType={botType} bot={bot} teamRef={teamRef}></SubmitBotDialog> */}
         </Container>
         {bot !== null &&
         <Container>
@@ -113,7 +117,8 @@ const BotCard = ({botType, bot, teamRef}) => {
                     const opponentName = key.split("--164")[0];
                     const points = bot.matches[key][`${botType}_points`];
                     const games = bot.matches[key][`${botType}_info`];
-                    const opponentErrors =  bot.matches[key][`${botType == "seeker" ? "hider":"seeker"}_errors`];
+                    console.log("Games:",games);
+                    const opponentErrors = bot.matches[key][`${botType === "seeker" ? "hider":"seeker"}_errors`];
                     return <MatchHistoryRow key={key} opponentName={opponentName} opponentErrors={opponentErrors} points={points} games={games}/>
                   }
                   )}

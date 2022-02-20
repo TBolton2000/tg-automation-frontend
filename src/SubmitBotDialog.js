@@ -20,6 +20,10 @@ const SubmitBotDialog = ({open, setOpen, botType, bot, teamRef}) => {
             window.alert("Bot name must not be empty");
             return;
         }
+        if (botName.indexOf(".") >= 0) {
+            window.alert("Bot name cannot contain a period");
+            return;
+        }
         if (file == null) {
             window.alert("Please select a file");
             return;

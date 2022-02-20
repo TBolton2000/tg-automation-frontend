@@ -62,7 +62,7 @@ const Scoreboard = () => {
                             <TableRow key={hider.id}>
                                 <TableCell>{hider.name}</TableCell>
                                 <TableCell>{hider.team}</TableCell>
-                                <TableCell>{Math.round(hider.average_points * 1000) / 100}</TableCell>
+                                <TableCell>{Math.round(hider.average_points * 1000) / 1000}</TableCell>
                             </TableRow>
                         )
                     }

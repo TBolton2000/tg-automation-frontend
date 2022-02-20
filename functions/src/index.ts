@@ -2,6 +2,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import axios from "axios";
+import * as rax from "retry-axios";
 
 admin.initializeApp();
 
@@ -98,6 +99,18 @@ export const onHiderReplaced = functions.firestore
       functions.logger.info("Successfully removed.");
     });
 
+// For sending to automation engine
+const axiosRetryConfig = {
+  raxConfig: {
+    retry: 10,
+    noResponseRetries: 10,
+    onRetryAttempt: (err: any) => {
+      const cfg = rax.getConfig(err);
+      functions.logger.error(`Retry attempt #${cfg!.currentRetryAttempt}`);
+    },
+  },
+  timeout: 500,
+};
 export const onSeekerSubmission = functions.firestore
     .document("/seeker_bots/{bot}").onCreate(async (snap, context) =>{
       functions.logger.info("botData:", snap.data());
@@ -120,11 +133,13 @@ export const onSeekerSubmission = functions.firestore
       };
       functions.logger.info("dataToSend:", dataToSend);
       const env = await db.doc("/config/ENV").get();
-      const url = (env && env.data()) ? env!.data()!.engine_url :
-        "http://ec2-3-19-208-93.us-east-2.compute.amazonaws.com";
+      const urls = (env && env.data()) ? env!.data()!.engine_url :
+        ["http://ec2-18-191-29-23.us-east-2.compute.amazonaws.com"];
+      const url = urls[Math.floor(Math.random() * urls.length)];
       functions.logger.log("url: ", url);
       try {
-        const engineResponse = await axios.post(url, dataToSend);
+        const engineResponse =
+            await axios.post(url, dataToSend, axiosRetryConfig);
         functions.logger.info("engineResponse:", engineResponse.data);
       } catch (e) {
         functions.logger.error("Axios error:", e);
@@ -153,10 +168,16 @@ export const onHiderSubmission = functions.firestore
       };
       functions.logger.info("dataToSend:", dataToSend);
       const env = await db.doc("/config/ENV").get();
-      const url = (env && env.data()) ? env!.data()!.engine_url :
-        "http://ec2-3-19-208-93.us-east-2.compute.amazonaws.com";
-      const engineResponse = await axios.post(url, dataToSend);
-      functions.logger.info("engineResponse:", engineResponse.data);
+      const urls = (env && env.data()) ? env!.data()!.engine_url :
+        ["http://ec2-18-191-29-23.us-east-2.compute.amazonaws.com"];
+      const url = urls[Math.floor(Math.random() * urls.length)];
+      try {
+        const engineResponse =
+            await axios.post(url, dataToSend, axiosRetryConfig);
+        functions.logger.info("engineResponse:", engineResponse.data);
+      } catch (e) {
+        functions.logger.error("Axios error:", e);
+      }
     });
 
 export const getMatchDataFromEngine = functions.https
@@ -198,9 +219,9 @@ export const getMatchDataFromEngine = functions.https
       response.send("Received Results");
     });
 
-const GAMES_PER_MATCH = 15;
+const GAMES_PER_MATCH = 25;
 export const refreshLeaderBoards = functions.pubsub
-    .schedule("every 2 minutes").onRun(async (context) => {
+    .schedule("every 1 minutes").onRun(async (context) => {
       // Compute Hider Scores
       const allHiderBotsSnapshot = await db.collection("/hider_bots")
           .where("replaced", "==", false).get();
