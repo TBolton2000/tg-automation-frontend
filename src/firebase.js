@@ -4,14 +4,15 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 
+// Old config invalidated
 const firebaseConfig = {
-    apiKey: "AIzaSyCN4K_nhsWVv8C8kkH9uEWozREMYxUfuv8",
-    authDomain: "turinggamesautomation.firebaseapp.com",
-    projectId: "turinggamesautomation",
-    storageBucket: "turinggamesautomation.appspot.com",
-    messagingSenderId: "775539068230",
-    appId: "1:775539068230:web:75a4862a3c5f6bd3ae6947",
-    measurementId: "G-6GEP2Q5LHN"
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: "",
+    measurementId: ""
 };
 
 const app = initializeApp(firebaseConfig);
